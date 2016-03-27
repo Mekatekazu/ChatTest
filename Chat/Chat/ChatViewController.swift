@@ -170,7 +170,9 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
         let cell:UITableViewCell = tableView.dequeueReusableCellWithIdentifier("cell")! as UITableViewCell
         cell.transform = CGAffineTransformMakeScale(1, -1)
         
+        cell.textLabel!.numberOfLines = 0
         cell.textLabel!.text = msgData.objectAtIndex(indexPath.row) as? String
+        cell.textLabel!.sizeToFit()
         
         
         return cell
