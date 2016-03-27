@@ -56,7 +56,11 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     override func viewWillDisappear(animated: Bool) {
         NSNotificationCenter.defaultCenter().removeObserver(self)
-        self.webSocket.send("\(nickname) left chat")
+        self.webSocket.send("\(self.nickname) left chat")
+        self.webSocket.close()
+        self.nickname = nil
+        msgData.removeAllObjects()
+        msgTable.reloadData()
     }
     
     func connectWebSocket(){
@@ -74,7 +78,9 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     func webSocketDidOpen(newWebSocket: SRWebSocket!) {
         webSocket = newWebSocket
-        self.webSocket.send("\(nickname) joined chat...")
+        if self.nickname != nil{
+            self.webSocket.send("\(self.nickname) joined chat...")
+        }
         self.title = "Connected"
     }
     
@@ -93,7 +99,6 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func webSocket(webSocket: SRWebSocket!, didReceiveMessage message: AnyObject!) {
-        //msgData.addObject(message)
         msgData.insertObject(message, atIndex: 0)
         self.msgTable.insertRowsAtIndexPaths([NSIndexPath(forRow: 0, inSection: 0) ], withRowAnimation: .Top)
         msgTable.scrollToRowAtIndexPath(NSIndexPath(forRow: 0, inSection: 0), atScrollPosition: .Top,
@@ -101,9 +106,8 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func sendMessage(){
-        print(message.text!)
         if message.text!.characters.count > 0 {
-            self.webSocket.send("\(nickname): \(message.text!)")
+            self.webSocket.send("\(self.nickname): \(message.text!)")
             message.text = ""
             message.resignFirstResponder()
         }
